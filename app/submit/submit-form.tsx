@@ -30,6 +30,48 @@ type SubmitInput = z.infer<typeof submitSchema>;
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
+// Client-side image compression: downscale to max 1920px on the longest edge
+// and re-encode as JPEG at 0.82 quality. These defaults are tunable.
+async function compressImage(original: File): Promise<File> {
+  try {
+    const bitmap = await createImageBitmap(original);
+    const MAX_EDGE = 1920;
+    let { width, height } = bitmap;
+
+    if (Math.max(width, height) <= MAX_EDGE) {
+      bitmap.close();
+      return original;
+    }
+
+    const scale = MAX_EDGE / Math.max(width, height);
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(
+        (b) => (b ? resolve(b) : reject(new Error("canvas.toBlob failed"))),
+        "image/jpeg",
+        0.82,
+      );
+    });
+
+    const ext = original.name.replace(/^.*(\.[^.]+)$/, "$1");
+    return new File([blob], original.name.replace(ext, ".jpg"), {
+      type: "image/jpeg",
+    });
+  } catch {
+    // If compression fails for any reason, fall back to the original file
+    return original;
+  }
+}
+
 function validateFile(file: File): string | null {
   if (!ACCEPTED_TYPES.includes(file.type)) {
     return "Only JPG, PNG, and WebP images are allowed.";
@@ -67,14 +109,15 @@ export function SubmitForm({ rooms }: { rooms: Room[] }) {
   }, [state, router, form]);
 
   const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const f = e.target.files?.[0];
       if (f) {
-        const error = validateFile(f);
+        const compressed = await compressImage(f);
+        const error = validateFile(compressed);
         setFileError(error);
         if (!error) {
-          setFile(f);
-          setPreview(URL.createObjectURL(f));
+          setFile(compressed);
+          setPreview(URL.createObjectURL(compressed));
         } else {
           setFile(null);
           setPreview(null);

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <!-- Camera body -->
+  <rect x="20" y="56" width="152" height="104" rx="14" fill="#1a1a1a"/>
+  <!-- Viewfinder bump -->
+  <rect x="56" y="28" width="80" height="36" rx="8" fill="#1a1a1a"/>
+  <!-- Outer lens ring -->
+  <circle cx="96" cy="108" r="30" fill="#ffffff"/>
+  <!-- Inner lens -->
+  <circle cx="96" cy="108" r="16" fill="#1a1a1a"/>
+  <!-- Lens highlight dot -->
+  <circle cx="88" cy="100" r="4" fill="#ffffff" opacity="0.4"/>
+</svg>

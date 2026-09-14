@@ -15,28 +15,35 @@ export function RoomActions({
   const [isPending, startTransition] = useTransition();
 
   return (
-    <button
-      disabled={isPending || submissionCount > 0}
-      onClick={() => {
-        if (confirm("Delete this room?")) {
-          startTransition(async () => {
-            try {
-              await deleteRoom(roomId);
-              router.refresh();
-            } catch {
-              alert("Cannot delete room with existing submissions.");
-            }
-          });
+    <span className="inline-flex items-center gap-2">
+      <button
+        disabled={isPending || submissionCount > 0}
+        onClick={() => {
+          if (confirm("Delete this room?")) {
+            startTransition(async () => {
+              try {
+                await deleteRoom(roomId);
+                router.refresh();
+              } catch {
+                alert("Cannot delete room with existing submissions.");
+              }
+            });
+          }
+        }}
+        className="text-xs text-destructive hover:text-destructive/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        title={
+          submissionCount > 0
+            ? "Cannot delete room with submissions"
+            : "Delete room"
         }
-      }}
-      className="text-xs text-destructive hover:text-destructive/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      title={
-        submissionCount > 0
-          ? "Cannot delete room with submissions"
-          : "Delete room"
-      }
-    >
-      Delete
-    </button>
+      >
+        {isPending ? "Deleting…" : "Delete"}
+      </button>
+      {submissionCount > 0 && (
+        <span className="text-xs text-muted-foreground">
+          Has {submissionCount} record{submissionCount !== 1 ? "s" : ""} — delete its records first
+        </span>
+      )}
+    </span>
   );
 }

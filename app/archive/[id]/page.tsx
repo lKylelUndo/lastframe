@@ -3,6 +3,8 @@ import Image from "next/image"
 import { prisma } from "@/lib/prisma"
 import { formatManila } from "@/lib/dates"
 import { buildImageVariants } from "@/lib/images"
+import { getSession } from "@/lib/auth"
+import { DeleteButton } from "./delete-button"
 import type { Metadata } from "next"
 
 export async function generateMetadata({
@@ -50,6 +52,8 @@ export default async function ArchiveDetailPage({
     )
   }
 
+  const session = await getSession()
+
   const variants = buildImageVariants(submission.imageUrl)
 
   const backHref = dateParam ? `/archive?date=${dateParam}` : "/archive"
@@ -89,6 +93,11 @@ export default async function ArchiveDetailPage({
         <p className="text-xs text-muted-foreground">
           {formatManila(submission.submittedAt, "EEEE, MMMM d, yyyy · h:mm a")}
         </p>
+        {session && (
+          <div className="mt-2">
+            <DeleteButton id={id} dateParam={dateParam} />
+          </div>
+        )}
       </div>
     </div>
   )

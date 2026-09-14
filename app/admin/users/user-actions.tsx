@@ -18,6 +18,7 @@ export function UserActions({
     <span className="inline-flex gap-2">
       <button
         disabled={isPending}
+        aria-busy={isPending || undefined}
         onClick={() =>
           startTransition(async () => {
             await toggleUserActive(userId);
@@ -26,10 +27,11 @@ export function UserActions({
         }
         className="text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
       >
-        {isActive ? "Disable" : "Enable"}
+        {isPending ? (isActive ? "Disabling…" : "Enabling…") : (isActive ? "Disable" : "Enable")}
       </button>
       <button
         disabled={isPending}
+        aria-busy={isPending || undefined}
         onClick={() => {
           if (confirm("Delete this user?")) {
             startTransition(async () => {
@@ -44,7 +46,7 @@ export function UserActions({
         }}
         className="text-xs text-destructive hover:text-destructive/80 transition-colors disabled:opacity-50"
       >
-        Delete
+        {isPending ? "Deleting…" : "Delete"}
       </button>
     </span>
   );

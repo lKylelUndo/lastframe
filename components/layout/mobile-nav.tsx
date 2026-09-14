@@ -2,17 +2,27 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Camera, Upload, LayoutDashboard } from "lucide-react"
+import { Camera, Upload, LayoutDashboard, LogIn } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const navItems = [
+const authedItems = [
   { href: "/archive", label: "Archive", icon: Camera },
   { href: "/submit", label: "Submit", icon: Upload },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 ] as const
 
-export function MobileNav() {
+const guestItems = [
+  { href: "/archive", label: "Archive", icon: Camera },
+  { href: "/login", label: "Sign In", icon: LogIn },
+] as const
+
+export function MobileNav({
+  session,
+}: {
+  session: { userId: string } | null
+}) {
   const pathname = usePathname()
+  const navItems = session ? authedItems : guestItems
 
   return (
     <nav

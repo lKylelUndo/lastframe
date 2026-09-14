@@ -67,7 +67,7 @@ export default async function RootLayout({
         <ThemeProvider>
           <Navbar session={session} />
           {children}
-          <MobileNav />
+          <MobileNav session={session} />
         </ThemeProvider>
       </body>
     </html>
